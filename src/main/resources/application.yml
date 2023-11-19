@@ -1,0 +1,40 @@
+server:
+  port: 8081
+# Property read from the HomeController to display the application version on the root url
+app:
+  version: 1.0.0
+
+# Rabbitmq topics
+spring:
+  cloud:
+    stream:
+      function:
+        # Below functional pipeline throttles Sessions every 1s
+        # Just uncomment the right one to use it a session stream pipeline
+        definition: publishSession;processSession;onProcessedSession
+        
+        # Below pipeline relies on the /events Rest endpoint to publish 
+        # a new Session instead of using a Supplier producer like above definition
+        # definition: processSession;onProcessedSession
+      bindings:
+        publishSession-out-0:
+          destination: sessions_publisher_channel
+          group: publishers
+        processSession-in-0:
+          destination: sessions_publisher_channel
+          group: processors
+        processSession-out-0:
+          destination: sessions_consumer_channel
+        onProcessedSession-in-0:
+          destination: sessions_consumer_channel
+          group: consumers
+
+  # NB: Spring can use the default rabbitmq property values, 
+  # if we did not change the default settings for 
+  # the message broker, and hence we would 
+  # be able to comment out below settings
+  # rabbitmq:
+  #   username: guest
+  #   password: guest
+  #   host: localhost
+  #   port: 15672
