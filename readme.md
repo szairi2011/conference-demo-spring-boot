@@ -31,11 +31,18 @@ To build and run the application using VSCode Maven extension, under cmd termina
 By defaut auto-update is set for SpringBoot to recompile any code changes and redeploy the app locally 
 
 NB: No need to run the same command again if the project is already built, we may only need to re-run it if the project gets out of sync. We simply need to Open the "ConferenceDemoApplication.java" and click on "Run Java" from the to right to launch the webapp.
+We can also just press F5 on the keyboard to do the same while the bootstrapper is running.
 
 NB: We don't need the thick jar file to run the application in VSCode, the VSCode extensions will do the needy.
 
+## Containerize and run the containerized application:
+Dockerfile and docker-compose.yml are created to improve the portability of the application.
+1. Until we get the Dokerized version of the application parametrizable using docker-compose environment variables, we need to modify the application.properties to include the docker-compose service name for mysql and rabbitmq (NB: just uncomment the commented entries in the file)
+2. We need to run > mvn clean install to repackage a new jar file containing the new entries. NB: This won't be neded when we will parameterize the docker compose files 
+3. Run > docker-compose up --build # The option --build is important to rebuild the image if the code or the application properties  has changed but not needed when parametrizing from docker-compose.yml
+
 ## Build a standalone thick jar application:
-To build a sef deployable jar web application where Tomcat is embedded by Springboot run:
+To build a thick jar web application where Tomcat is embedded by Springboot run:
 > mvn clean install # This will build a jar applicatin that can be run using:
 > java -jar conference-demo-0.0.1-SNAPSHOT.jar
 

@@ -1,0 +1,51 @@
+version: "3.4"
+
+services:
+  conferencedemo:
+    image: conferencedemo
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8081:8081
+    depends_on:
+      - mysql_db
+      - rabbitmq
+    networks:
+      - conference_demo_net
+
+  mysql_db:
+    image: mysql
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    networks:
+      - conference_demo_net
+
+  # rabbitmq:
+  #   image: rabbitmq
+  #   command: rabbitmq-server
+  #   expose:
+  #     - 5672
+  #     - 15672
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: "rabbitmq"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    # volumes:
+    #   - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    #   - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - conference_demo_net
+
+networks:
+  conference_demo_net:
+    driver: bridge
